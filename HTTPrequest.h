@@ -10,24 +10,6 @@
 
 class HTTPrequest
 {
-private:
-    bool parseRequestLine(const std::string& line); /* 解析请求行 */
-    void parseRequestHeader(const std::string& line); /* 解析请求头 */
-    void parseDataBody(const std::string& line); /* 解析数据体 */
-
-
-    void parsePath();
-    void parsePost();
-
-    static int convertHex(char ch);
-
-    PARSE_STATE state;
-    std::string method, path, version, body;
-    std::unordered_map<std::string,std::string> header;
-    std::unordered_map<std::string,std::string> post;
-
-    static const std::unordered_set<std::string> DEFAULT_HTML;
-   
 public:
     enum PARSE_STATE{
         REQUEST_LINE,
@@ -47,13 +29,13 @@ public:
         CLOSED_CONNECTION,
     };
 
-    HTTPrequest() { init(); };
-    ~HTTPrequest() = default;
+    HTTPrequest() {init();};
+    ~HTTPrequest()=default;
 
     void init();
-    bool parse(Buffer& buff); /* 解析HTTP请求 */
+    bool parse(Buffer& buff); //解析HTTP请求
 
-    /* 获取HTTP信息 */
+    //获取HTTP信息
     std::string path() const;
     std::string& path();
     std::string method() const;
@@ -63,6 +45,26 @@ public:
 
     bool isKeepAlive() const;
 
+private:
+    bool parseRequestLine_(const std::string& line);//解析请求行
+    void parseRequestHeader_(const std::string& line); //解析请求头
+    void parseDataBody_(const std::string& line); //解析数据体
+
+
+    void parsePath_();
+    void parsePost_();
+
+    static int convertHex(char ch);
+
+    PARSE_STATE state_;
+    std::string method_,path_,version_,body_;
+    std::unordered_map<std::string,std::string>header_;
+    std::unordered_map<std::string,std::string>post_;
+
+    static const std::unordered_set<std::string>DEFAULT_HTML;
+   
+
+
 };
 
-#endif
+#endif 

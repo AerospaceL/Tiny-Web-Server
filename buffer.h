@@ -10,19 +10,9 @@
 #include<assert.h>
 
 class Buffer{
-private:
-    std::vector<char> buffer; // buffer实体
-    std::atomic<std::size_t> readPos; // 读指针位置
-    std::atomic<std::size_t> writePos; // 写指针位置
-    // 返回buffer初始位置的指针
-    char* beginPtr();
-    const char* beginPtr() const;
-    // 用于缓存区扩容
-    void allocateSpace(size_t len);
-
 public:
     Buffer(int bufferSize = 1024);
-    ~Buffer();
+    ~Buffer() = default;
 
     void initPtr(); // 初始化读指针和写指针
 
@@ -31,7 +21,7 @@ public:
     size_t writeableByte() const; // 缓存区可以写入的字节数
 
     const char* curReadPtr() const; // 获取当前读指针
-    const char* curWritePtr() const; // 获取当前写指针
+    const char* curWritePtrConst() const; // 获取当前写指针
     char* curWritePtr();
 
     void updateReadPtr(size_t len); // 更新读指针
@@ -52,6 +42,16 @@ public:
 
     // 将缓存区的数据转化为字符串
     std::string bufferToStr(); 
+
+private:
+    std::vector<char> buffer; // buffer实体
+    std::atomic<std::size_t> readPos; // 读指针位置
+    std::atomic<std::size_t> writePos; // 写指针位置
+    // 返回buffer初始位置的指针
+    char* beginPtr();
+    const char* beginPtr() const;
+    // 用于缓存区扩容
+    void allocateSpace(size_t len);
 
 };
 

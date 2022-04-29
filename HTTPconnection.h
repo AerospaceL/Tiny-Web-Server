@@ -1,7 +1,7 @@
 #ifndef HTTP_CONNECTION_H
 #define HTTP_CONNECTION_H
 
-#include<arpa/inet.h>
+#include<arpa/inet.h> 
 #include<sys/uio.h>
 #include<iostream>
 #include<sys/types.h>
@@ -12,20 +12,6 @@
 #include "HTTPresponse.h"
 
 class HTTPconnection{
-private:
-    int fd_;                  //HTTP连接对应的描述符
-    struct sockaddr_in addr_;
-    bool isClose_;            //标记是否关闭连接
-
-    int iovCnt_;
-    struct iovec iov_[2];
-
-    Buffer readBuffer_;       //读缓冲区
-    Buffer writeBuffer_;      //写缓冲区
-
-    HTTPrequest request_;    
-    HTTPresponse response_;
-
 public:
     HTTPconnection();
     ~HTTPconnection();
@@ -60,6 +46,20 @@ public:
     static bool isET;
     static const char* srcDir;
     static std::atomic<int>userCount;
+
+private:
+    int fd_;                  //HTTP连接对应的描述符
+    struct sockaddr_in addr_;
+    bool isClose_;            //标记是否关闭连接
+
+    int iovCnt_;
+    struct iovec iov_[2];
+
+    Buffer readBuffer_;       //读缓冲区
+    Buffer writeBuffer_;      //写缓冲区
+
+    HTTPrequest request_;    
+    HTTPresponse response_;
 
 };
 

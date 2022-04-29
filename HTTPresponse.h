@@ -2,16 +2,29 @@
 #define HTTP_RESPONSE_H
 
 #include <unordered_map>
-#include <fcntl.h>  //open
-#include <unistd.h> //close
-#include <sys/stat.h> //stat
-#include <sys/mman.h> //mmap,munmap
+#include <fcntl.h>  
+#include <unistd.h> 
+#include <sys/stat.h> 
+#include <sys/mman.h> 
 #include <assert.h>
 
 #include "buffer.h"
 
 class HTTPresponse
 {
+public:
+    HTTPresponse();
+    ~HTTPresponse();
+
+    void init(const std::string& srcDir,std::string& path,bool isKeepAlive=false,int code=-1);
+    void makeResponse(Buffer& buffer);
+    void unmapFile_();
+    char* file();
+    size_t fileLen() const;
+    void errorContent(Buffer& buffer,std::string message);
+    int code() const {return code_;}
+
+
 private:
     void addStateLine_(Buffer& buffer);
     void addResponseHeader_(Buffer& buffer);
@@ -32,19 +45,7 @@ private:
     static const std::unordered_map<std::string, std::string> SUFFIX_TYPE;
     static const std::unordered_map<int, std::string> CODE_STATUS;
     static const std::unordered_map<int, std::string> CODE_PATH;
-
-public:
-    HTTPresponse();
-    ~HTTPresponse();
-
-    void init(const std::string& srcDir,std::string& path,bool isKeepAlive=false,int code=-1);
-    void makeResponse(Buffer& buffer);
-    void unmapFile_();
-    char* file();
-    size_t fileLen() const;
-    void errorContent(Buffer& buffer,std::string message);
-    int code() const { return code_; }
     
 };
 
-#endif
+#endif 

@@ -17,7 +17,7 @@ private:
     bool m_stop;
 
 public:
-    ThreadPool(size_t threadNumber):m_stop(true){
+    ThreadPool(size_t threadNumber):m_stop(false){
         for(size_t i = 0; i < threadNumber; i++){
             m_pool.emplace_back(
                 [this](){

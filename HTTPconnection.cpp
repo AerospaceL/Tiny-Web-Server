@@ -25,7 +25,7 @@ void HTTPconnection::initHTTPConn(int fd, const sockaddr_in& addr) {
 }
 
 void HTTPconnection::closeHTTPConn() {
-    response_.unmapFile();
+    response_.unmapFile_();
     if(isClose_ == false){
         isClose_ = true; 
         userCount--;
@@ -89,7 +89,7 @@ ssize_t HTTPconnection::writeBuffer(int* saveErrno) {
 
 bool HTTPconnection::handleHTTPConn() {
     request_.init();
-    if(readBuffer_.readableBytes() <= 0) {
+    if(readBuffer_.readableByte() <= 0) {
         //std::cout<<"readBuffer is empty!"<<std::endl;
         return false;
     }
@@ -104,7 +104,7 @@ bool HTTPconnection::handleHTTPConn() {
     response_.makeResponse(writeBuffer_);
     /* 响应头 */
     iov_[0].iov_base = const_cast<char*>(writeBuffer_.curReadPtr());
-    iov_[0].iov_len = writeBuffer_.readableBytes();
+    iov_[0].iov_len = writeBuffer_.readableByte();
     iovCnt_ = 1;
 
     /* 文件 */

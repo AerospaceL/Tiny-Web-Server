@@ -3,96 +3,95 @@
 const std::unordered_set<std::string> HTTPrequest::DEFAULT_HTML{"/index", "/welcome", "/video", "/picture"};
 
 void HTTPrequest::init() {
-    method = path = version = body = "";
-    state = REQUEST_LINE;
-    header.clear();
-    post.clear();
+    method_ = path_ = version_ = body_ = "";
+    state_ = REQUEST_LINE;
+    header_.clear();
+    post_.clear();
 }
 
 bool HTTPrequest::isKeepAlive() const {
-    if(header.count("Connection") == 1) {
-        return header.find("Connection")->second == "keep-alive" && version == "1.1";
+    if(header_.count("Connection") == 1) {
+        return header_.find("Connection")->second == "keep-alive" && version_ == "1.1";
     }
     return false;
 }
 
 bool HTTPrequest::parse(Buffer& buff) {
     const char CRLF[] = "\r\n";
-    if(buff.readableBytes() <= 0) {
+    if(buff.readableByte() <= 0) {
         return false;
     }
-
-    while(buff.readableBytes() && state != FINISH) {
+    while(buff.readableByte() && state_ != FINISH) {
         const char* lineEnd = std::search(buff.curReadPtr(), buff.curWritePtrConst(), CRLF, CRLF + 2);
         std::string line(buff.curReadPtr(), lineEnd);
-        switch(state)
+        switch(state_)
         {
         case REQUEST_LINE:
-            if(!parseRequestLine(line)) {
+            if(!parseRequestLine_(line)) {
                 return false;
             }
-            parsePath();
+            parsePath_();
             break;    
         case HEADERS:
-            parseRequestHeader(line);
-            if(buff.readableBytes() <= 2) {
-                state = FINISH;
+            parseRequestHeader_(line);
+            if(buff.readableByte() <= 2) {
+                state_ = FINISH;
             }
             break;
         case BODY:
-            parseDataBody(line);
+            parseDataBody_(line);
             break;
         default:
             break;
         }
         if(lineEnd == buff.curWritePtr()) { break; }
-        buff.updateReadPtrUntilEnd(lineEnd + 2);
+        buff.updateReadPtrToEnd(lineEnd + 2);
     }
     return true;
 }
 
-void HTTPrequest::parsePath() {
-    if(path == "/") {
-        path = "/index.html"; 
+void HTTPrequest::parsePath_() {
+    if(path_ == "/") {
+        path_ = "/index.html"; 
     }
     else {
         for(auto &item: DEFAULT_HTML) {
-            if(item == path) {
-                path += ".html";
+            if(item == path_) {
+                path_ += ".html";
                 break;
             }
         }
     }
 }
 
-bool HTTPrequest::parseRequestLine(const std::string& line) {
+bool HTTPrequest::parseRequestLine_(const std::string& line) {
     std::regex patten("^([^ ]*) ([^ ]*) HTTP/([^ ]*)$");
     std::smatch subMatch;
     if(regex_match(line, subMatch, patten)) {   
-        method = subMatch[1];
-        path = subMatch[2];
-        version = subMatch[3];
-        state = HEADERS;
+        method_ = subMatch[1];
+        path_ = subMatch[2];
+        version_ = subMatch[3];
+        state_ = HEADERS;
         return true;
     }
     return false;
 }
 
-void HTTPrequest::parseRequestHeader(const std::string& line) {
+void HTTPrequest::parseRequestHeader_(const std::string& line) {
     std::regex patten("^([^:]*): ?(.*)$");
     std::smatch subMatch;
     if(regex_match(line, subMatch, patten)) {
-        header[subMatch[1]] = subMatch[2];
+        header_[subMatch[1]] = subMatch[2];
     }
     else {
-        state = BODY;
+        state_ = BODY;
     }
 }
 
-void HTTPrequest::parseDataBody(const std::string& line) {
-    body = line;
-    parsePost();
-    state = FINISH;
+void HTTPrequest::parseDataBody_(const std::string& line) {
+    body_ = line;
+    parsePost_();
+    state_ = FINISH;
 }
 
 int HTTPrequest::convertHex(char ch) {
@@ -101,75 +100,75 @@ int HTTPrequest::convertHex(char ch) {
     return ch;
 }
 
-void HTTPrequest::parsePost() {
-    if(method == "POST" && header["Content-Type"] == "application/x-www-form-urlencoded") {
-        if(body.size() == 0) { return; }
+void HTTPrequest::parsePost_() {
+    if(method_ == "POST" && header_["Content-Type"] == "application/x-www-form-urlencoded") {
+        if(body_.size() == 0) { return; }
 
         std::string key, value;
         int num = 0;
-        int n = body.size();
+        int n = body_.size();
         int i = 0, j = 0;
 
         for(; i < n; i++) {
-            char ch = body[i];
+            char ch = body_[i];
             switch (ch) {
             case '=':
-                key = body.substr(j, i - j);
+                key = body_.substr(j, i - j);
                 j = i + 1;
                 break;
             case '+':
-                body[i] = ' ';
+                body_[i] = ' ';
                 break;
             case '%':
-                num = convertHex(body[i + 1]) * 16 + convertHex(body[i + 2]);
-                body[i + 2] = num % 10 + '0';
-                body[i + 1] = num / 10 + '0';
+                num = convertHex(body_[i + 1]) * 16 + convertHex(body_[i + 2]);
+                body_[i + 2] = num % 10 + '0';
+                body_[i + 1] = num / 10 + '0';
                 i += 2;
                 break;
             case '&':
-                value = body.substr(j, i - j);
+                value = body_.substr(j, i - j);
                 j = i + 1;
-                post[key] = value;
+                post_[key] = value;
                 break;
             default:
                 break;
             }
         }
         assert(j <= i);
-        if(post.count(key) == 0 && j < i) {
-            value = body.substr(j, i - j);
-            post[key] = value;
+        if(post_.count(key) == 0 && j < i) {
+            value = body_.substr(j, i - j);
+            post_[key] = value;
         }
     }   
 }
 
 std::string HTTPrequest::path() const{
-    return path;
+    return path_;
 }
 
 std::string& HTTPrequest::path(){
-    return path;
+    return path_;
 }
 std::string HTTPrequest::method() const {
-    return method;
+    return method_;
 }
 
 std::string HTTPrequest::version() const {
-    return version;
+    return version_;
 }
 
 std::string HTTPrequest::getPost(const std::string& key) const {
     assert(key != "");
-    if(post.count(key) == 1) {
-        return post.find(key)->second;
+    if(post_.count(key) == 1) {
+        return post_.find(key)->second;
     }
     return "";
 }
 
 std::string HTTPrequest::getPost(const char* key) const {
     assert(key != nullptr);
-    if(post.count(key) == 1) {
-        return post.find(key)->second;
+    if(post_.count(key) == 1) {
+        return post_.find(key)->second;
     }
     return "";
 }

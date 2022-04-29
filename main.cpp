@@ -1,7 +1,10 @@
-#include "threadpool.h"
+#include <unistd.h>
+#include "webserver.h"
 
-int main()
-{
-    ThreadPool* tp = new ThreadPool(4);
-    return 0;
-}
+int main() {
+    /* 守护进程 后台运行 */
+    //daemon(1, 0); 
+
+    WebServer server(1316, 3, 60000, false, 4);            
+    server.Start();
+} 

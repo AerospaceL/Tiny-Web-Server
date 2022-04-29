@@ -29,7 +29,7 @@ const char* Buffer::curReadPtr() const
     return beginPtr() + readPos;
 }
 
-const char* Buffer::curWritePtr() const
+const char* Buffer::curWritePtrConst() const
 {
     return beginPtr() + writePos;
 }
