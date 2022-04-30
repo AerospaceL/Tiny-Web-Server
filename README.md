@@ -36,6 +36,13 @@ cd bin
 线程池：参见[@mtrebi](https://github.com/mtrebi/thread-pool)的简洁实现  
 关于各个模块的实现细节，本人会在后续更新  
 
+待完善部分
+---
++ 实现用户的登录和注册功能
++ 实现日志功能
++ 模拟Proactor模型的实现
++ HTTP协议的其他部分功能
+
 致谢
 ---
 Linux高性能服务器编程，游双著.   
