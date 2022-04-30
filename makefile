@@ -4,8 +4,8 @@ CXXFLAGS=-std=c++11 -O2 -Wall -g
 
 TARGET:=tiny-web-server
 SOURCE:=$(wildcard ../*.cpp)
-OBJS=./buffer.cpp ./HTTPrequest.cpp ./HTTPresponse.cpp ./HTTPconnection.cpp \
-     ./timer.cpp ./epoller.cpp ./webserver.cpp ./main.cpp
+OBJS=./buffer/buffer.cpp ./http/HTTPrequest.cpp ./http/HTTPresponse.cpp ./http/HTTPconnection.cpp \
+     ./timer/timer.cpp ./epoller/epoller.cpp ./webserver/webserver.cpp ./main.cpp
 
 $(TARGET):$(OBJS)
 	$(CXX) $(CXXFLAGS)  $(OBJS) -o ./bin/$(TARGET) -pthread
